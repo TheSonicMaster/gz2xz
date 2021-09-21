@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# gz2xz 1.0.1 - Copyright (C) 2021 The Sonic Master.
+# gz2xz 1.0.2 - Copyright (C) 2021 The Sonic Master.
 #
 # This is GPL-3.0+ licensed free software. A copy of the license can be"
 # obtained from <https://www.gnu.org/licenses/gpl-3.0.en.html>."
@@ -14,7 +14,7 @@ invocation="$(basename $0)"
 bindir="$(dirname $0)"
 # Help function.
 help() {
-  echo "gz2xz 1.0.1 - Copyright (C) 2021 The Sonic Master."
+  echo "gz2xz 1.0.2 - Copyright (C) 2021 The Sonic Master."
   echo
   echo "Usage: $invocation <file_to_convert>"
   echo
@@ -85,7 +85,7 @@ gz_to_lz4() {
 gz_to_zst() {
   uncmp="$(echo $1 | sed 's/.gz//')"
   gzip -cd $1 > "$wdir/$uncmp"
-  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+  zstd -c "$wdir/$uncmp" > "$uncmp.zst"
 }
 xz_to_gz() {
   uncmp="$(echo $1 | sed 's/.xz//')"
@@ -105,7 +105,7 @@ xz_to_lz4() {
 xz_to_zst() {
   uncmp="$(echo $1 | sed 's/.xz//')"
   xz -cd $1 > "$wdir/$uncmp"
-  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+  zstd -c "$wdir/$uncmp" > "$uncmp.zst"
 }
 bz2_to_gz() {
   uncmp="$(echo $1 | sed 's/.bz2//')"
@@ -125,7 +125,7 @@ bz2_to_lz4() {
 bz2_to_zst() {
   uncmp="$(echo $1 | sed 's/.bz2//')"
   bzip2 -cd $1 > "$wdir/$uncmp"
-  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+  zstd -c "$wdir/$uncmp" > "$uncmp.zst"
 }
 lz4_to_gz() {
   uncmp="$(echo $1 | sed 's/.lz4//')"
@@ -145,7 +145,7 @@ lz4_to_bz2() {
 lz4_to_zst() {
   uncmp="$(echo $1 | sed 's/.lz4//')"
   lz4 -cd $1 > "$wdir/$uncmp"
-  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+  zstd -c "$wdir/$uncmp" > "$uncmp.zst"
 }
 zst_to_gz() {
   uncmp="$(echo $1 | sed 's/.zst//')"
