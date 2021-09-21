@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# gz2xz 1.0.0 - Copyright (C) 2021 The Sonic Master.
+# gz2xz 1.0.1 - Copyright (C) 2021 The Sonic Master.
 #
 # This is GPL-3.0+ licensed free software. A copy of the license can be"
 # obtained from <https://www.gnu.org/licenses/gpl-3.0.en.html>."
@@ -14,7 +14,7 @@ invocation="$(basename $0)"
 bindir="$(dirname $0)"
 # Help function.
 help() {
-  echo "gz2xz 1.0.0 - Copyright (C) 2021 The Sonic Master."
+  echo "gz2xz 1.0.1 - Copyright (C) 2021 The Sonic Master."
   echo
   echo "Usage: $invocation <file_to_convert>"
   echo
@@ -216,7 +216,7 @@ case "$invocation" in
   bz22gz ) bz2_to_gz  $1 ;;
   bz22xz ) bz2_to_xz  $1 ;;
   bz22lz4) bz2_to_lz4 $1 ;;
-  bz2zst ) bz2_to_zst $1 ;;
+  bz22zst) bz2_to_zst $1 ;;
   lz42gz ) lz4_to_gz  $1 ;;
   lz42xz ) lz4_to_xz  $1 ;;
   lz42bz2) lz4_to_bz2 $1 ;;
