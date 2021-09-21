@@ -1,0 +1,231 @@
+#!/bin/bash
+#
+# gz2xz 1.0.0 - Copyright (C) 2021 The Sonic Master.
+#
+# This is GPL-3.0+ licensed free software. A copy of the license can be"
+# obtained from <https://www.gnu.org/licenses/gpl-3.0.en.html>."
+#
+# Exit on error.
+set -e
+# Set a working directory.
+wdir="$(mktemp -d)"
+# Check invocation and binary directory.
+invocation="$(basename $0)"
+bindir="$(dirname $0)"
+# Help function.
+help() {
+  echo "gz2xz 1.0.0 - Copyright (C) 2021 The Sonic Master."
+  echo
+  echo "Usage: $invocation <file_to_convert>"
+  echo
+  echo "gz2xz converts files between different compression algorithms."
+  echo "Despite it's name, it supports converting many compression file types:"
+  echo
+  echo ".gz  (gz2xz,  gz2bz2, gz2lz4,  gz2zst ) [Requires installed gzip ]"
+  echo ".xz  (xz2gz,  xz2bz2, xz2lz4,  xz2zst ) [Requires installed xz   ]"
+  echo ".bz2 (bz22gz, bz22xz, bz22lz4, bz22zst) [Requires installed bzip2]"
+  echo ".lz4 (lz42gz, lz42xz, lz42bz2, lz42zst) [Requires installed lz4  ]"
+  echo ".zst (zst2gz, zst2xz, zst2bz2, zst2lz4) [Requires installed zstd ]"
+  echo
+  echo "Symlinks are used to define what conversion should take place."
+  echo "e.g. if invoked as 'xz2zst', then it will convert .xz to .zst."
+  echo
+  echo "For convenience, the '--install-symlinks' option will install all"
+  echo "possible symlinks for you, so you don't have to do any manual work."
+  echo "The '--remove-symlinks' option will remove any symlinks that were"
+  echo "installed by '--install-symlinks'."
+  echo
+  echo "This is GPL-3.0+ licensed free software. A copy of the license can be"
+  echo "obtained from <https://www.gnu.org/licenses/gpl-3.0.en.html>."
+}
+# Install symlinks function.
+install_symlinks() {
+  for link in gz2bz2 gz2lz4 gz2zst xz2gz xz2bz2 xz2lz4 xz2zst bz22gz bz22xz \
+  bz22lz4 bz22zst lz42gz lz42xz lz42bz2 lz42zst zst2gz zst2xz zst2bz2 zst2lz4
+  do
+    if [ -e "$bindir/$link" ]; then
+      echo "Warning: $bindir/$link exists, not overriding it." >&2
+    else
+      ln -sv gz2xz "$bindir/$link"
+    fi
+  done
+  echo "Symlinks installed successfully."
+}
+# Remove symlinks function.
+remove_symlinks() {
+  for link in gz2bz2 gz2lz4 gz2zst xz2gz xz2bz2 xz2lz4 xz2zst bz22gz bz22xz \
+  bz22lz4 bz22zst lz42gz lz42xz lz42bz2 lz42zst zst2gz zst2xz zst2bz2 zst2lz4
+  do
+    if [ ! -e "$bindir/$link" ]; then
+      echo "Warning: $bindir/$link does not exist, not removing it." >&2
+    elif [ ! -L "$bindir/$link" ]; then
+      echo "Warning: $bindir/$link is not a symlink, not removing it." >&2
+    else
+      rm -v "$bindir/$link"
+    fi
+  done
+  echo "Symlinks removed successfully."
+}
+# Conversion functions.
+gz_to_xz() {
+  uncmp="$(echo $1 | sed 's/.gz//')"
+  gzip -cd $1 > "$wdir/$uncmp"
+  xz -c "$wdir/$uncmp" > "$uncmp.xz"
+}
+gz_to_bz2() {
+  uncmp="$(echo $1 | sed 's/.gz//')"
+  gzip -cd $1 > "$wdir/$uncmp"
+  bzip2 -c "$wdir/$uncmp" > "$uncmp.bz2"
+}
+gz_to_lz4() {
+  uncmp="$(echo $1 | sed 's/.gz//')"
+  gzip -cd $1 > "$wdir/$uncmp"
+  lz4 -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+gz_to_zst() {
+  uncmp="$(echo $1 | sed 's/.gz//')"
+  gzip -cd $1 > "$wdir/$uncmp"
+  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+xz_to_gz() {
+  uncmp="$(echo $1 | sed 's/.xz//')"
+  xz -cd $1 > "$wdir/$uncmp"
+  gzip -c "$wdir/$uncmp" > "$uncmp.gz"
+}
+xz_to_bz2() {
+  uncmp="$(echo $1 | sed 's/.xz//')"
+  xz -cd $1 > "$wdir/$uncmp"
+  bzip2 -c "$wdir/$uncmp" > "$uncmp.bz2"
+}
+xz_to_lz4() {
+  uncmp="$(echo $1 | sed 's/.xz//')"
+  xz -cd $1 > "$wdir/$uncmp"
+  lz4 -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+xz_to_zst() {
+  uncmp="$(echo $1 | sed 's/.xz//')"
+  xz -cd $1 > "$wdir/$uncmp"
+  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+bz2_to_gz() {
+  uncmp="$(echo $1 | sed 's/.bz2//')"
+  bzip2 -cd $1 > "$wdir/$uncmp"
+  gzip -c "$wdir/$uncmp" > "$uncmp.gz"
+}
+bz2_to_xz() {
+  uncmp="$(echo $1 | sed 's/.bz2//')"
+  bzip2 -cd $1 > "$wdir/$uncmp"
+  xz -c "$wdir/$uncmp" > "$uncmp.xz"
+}
+bz2_to_lz4() {
+  uncmp="$(echo $1 | sed 's/.bz2//')"
+  bzip2 -cd $1 > "$wdir/$uncmp"
+  lz4 -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+bz2_to_zst() {
+  uncmp="$(echo $1 | sed 's/.bz2//')"
+  bzip2 -cd $1 > "$wdir/$uncmp"
+  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+lz4_to_gz() {
+  uncmp="$(echo $1 | sed 's/.lz4//')"
+  lz4 -cd $1 > "$wdir/$uncmp"
+  gzip -c "$wdir/$uncmp" > "$uncmp.gz"
+}
+lz4_to_xz() {
+  uncmp="$(echo $1 | sed 's/.lz4//')"
+  lz4 -cd $1 > "$wdir/$uncmp"
+  xz -c "$wdir/$uncmp" > "$uncmp.xz"
+}
+lz4_to_bz2() {
+  uncmp="$(echo $1 | sed 's/.lz4//')"
+  lz4 -cd $1 > "$wdir/$uncmp"
+  bzip2 -c "$wdir/$uncmp" > "$uncmp.bz2"
+}
+lz4_to_zst() {
+  uncmp="$(echo $1 | sed 's/.lz4//')"
+  lz4 -cd $1 > "$wdir/$uncmp"
+  zstd -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+zst_to_gz() {
+  uncmp="$(echo $1 | sed 's/.zst//')"
+  zstd -cd $1 > "$wdir/$uncmp"
+  gzip -c "$wdir/$uncmp" > "$uncmp.gz"
+}
+zst_to_xz() {
+  uncmp="$(echo $1 | sed 's/.zst//')"
+  zstd -cd $1 > "$wdir/$uncmp"
+  xz -c "$wdir/$uncmp" > "$uncmp.xz"
+}
+zst_to_bz2() {
+  uncmp="$(echo $1 | sed 's/.zst//')"
+  zstd -cd $1 > "$wdir/$uncmp"
+  bzip2 -c "$wdir/$uncmp" > "$uncmp.bz2"
+}
+zst_to_lz4() {
+  uncmp="$(echo $1 | sed 's/.zst//')"
+  zstd -cd $1 > "$wdir/$uncmp"
+  lz4 -c "$wdir/$uncmp" > "$uncmp.lz4"
+}
+# Display help and/or version text.
+if [ -z "$1" ]; then
+  help >&2
+  exit 1
+elif [ "$1" = "-version" ]; then
+  help | head -n1
+  help | tail -n3
+  exit 0
+elif [ "$1" = "--version" ]; then
+  help | head -n1
+  help | tail -n3
+  exit 0
+elif [ "$1" = "-help" ]; then
+  help
+  exit 0
+elif [ "$1" = "--help" ]; then
+  help
+  exit 0
+elif [ "$1" = "-install-symlinks" ]; then
+  install_symlinks
+  exit 0
+elif [ "$1" = "--install-symlinks" ]; then
+  install_symlinks
+  exit 0
+elif [ "$1" = "-remove-symlinks" ]; then
+  remove_symlinks
+  exit 0
+elif [ "$1" = "--remove-symlinks" ]; then
+  remove_symlinks
+  exit 0
+fi
+# Ensure $1 is a file.
+if [ ! -f "$1" ]; then
+  echo "Error: Cannot convert non-existant file ($1)."
+  exit 1
+fi
+# Run the function depending on invocation
+case "$invocation" in
+  gz2xz  ) gz_to_xz   $1 ;;
+  gz2bz2 ) gz_to_bz2  $1 ;;
+  gz2lz4 ) gz_to_lz4  $1 ;;
+  gz2zst ) gz_to_zst  $1 ;;
+  xz2gz  ) xz_to_gz   $1 ;;
+  xz2bz2 ) xz_to_bz2  $1 ;;
+  xz2lz4 ) xz_to_lz4  $1 ;;
+  xz2zst ) xz_to_zst  $1 ;;
+  bz22gz ) bz2_to_gz  $1 ;;
+  bz22xz ) bz2_to_xz  $1 ;;
+  bz22lz4) bz2_to_lz4 $1 ;;
+  bz2zst ) bz2_to_zst $1 ;;
+  lz42gz ) lz4_to_gz  $1 ;;
+  lz42xz ) lz4_to_xz  $1 ;;
+  lz42bz2) lz4_to_bz2 $1 ;;
+  lz42zst) lz4_to_zst $1 ;;
+  zst2gz ) zst_to_gz  $1 ;;
+  zst2xz ) zst_to_xz  $1 ;;
+  zst2bz2) zst_to_bz2 $1 ;;
+  zst2lz4) zst_to_lz4 $1 ;;
+  *) echo "WARNING: Invalid invocation. Assuming 'gz2xz'." >&2; gz_to_xz $1 ;;
+esac
+# Clean up temporary directory.
+rm -rf "$wdir"
