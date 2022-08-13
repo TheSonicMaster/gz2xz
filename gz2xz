@@ -1,25 +1,25 @@
 #!/bin/bash
 #
-# gz2xz 1.0.2 - Copyright (C) 2021 The Sonic Master.
+# gz2xz 1.1.0 - Copyright (C) 2021-2022 The Sonic Master.
 #
 # This is GPL-3.0+ licensed free software. A copy of the license can be"
-# obtained from <https://www.gnu.org/licenses/gpl-3.0.en.html>."
+# obtained from <https://www.gnu.org/licenses/gpl.html>."
 #
 # Exit on error.
 set -e
-# Set a working directory.
-wdir="$(mktemp -d)"
+# This line may be uncommented automatically by 'make'. See README.md for info.
+#GZ2XZ_VENDORED_INSTALLATION=1
 # Check invocation and binary directory.
 invocation="$(basename $0)"
 bindir="$(dirname $0)"
 # Help function.
 help() {
-  echo "gz2xz 1.0.2 - Copyright (C) 2021 The Sonic Master."
+  echo "gz2xz 1.1.0 - Copyright (C) 2021-2022 The Sonic Master."
   echo
   echo "Usage: $invocation <file_to_convert>"
   echo
   echo "gz2xz converts files between different compression algorithms."
-  echo "Despite it's name, it supports converting many compression file types:"
+  echo "Despite it's name, it supports converting many compressed file types:"
   echo
   echo ".gz  (gz2xz,  gz2bz2, gz2lz4,  gz2zst ) [Requires installed gzip ]"
   echo ".xz  (xz2gz,  xz2bz2, xz2lz4,  xz2zst ) [Requires installed xz   ]"
@@ -30,16 +30,21 @@ help() {
   echo "Symlinks are used to define what conversion should take place."
   echo "e.g. if invoked as 'xz2zst', then it will convert .xz to .zst."
   echo
-  echo "For convenience, the '--install-symlinks' option will install all"
-  echo "possible symlinks for you, so you don't have to do any manual work."
-  echo "The '--remove-symlinks' option will remove any symlinks that were"
-  echo "installed by '--install-symlinks'."
+  echo "If you are using a distribution-provided package of gz2xz, symlinks"
+  echo "should be installed automatically. However, if you manually installed"
+  echo "gz2xz from the source repository, you can pass '--install-symlinks' or"
+  echo "'--remove-symlinks'. See the gz2xz(1) manual page for more info."
   echo
   echo "This is GPL-3.0+ licensed free software. A copy of the license can be"
-  echo "obtained from <https://www.gnu.org/licenses/gpl-3.0.en.html>."
+  echo "obtained from <https://www.gnu.org/licenses/gpl.html>."
 }
 # Install symlinks function.
 install_symlinks() {
+  if [ ! -z "$GZ2XZ_VENDORED_INSTALLATION" ]; then
+    echo "Error: This command cannot be run as your installation is a" >&2
+    echo "distribution-provided package, and it may break package managers." >&2
+    exit 1
+  fi
   for link in gz2bz2 gz2lz4 gz2zst xz2gz xz2bz2 xz2lz4 xz2zst bz22gz bz22xz \
   bz22lz4 bz22zst lz42gz lz42xz lz42bz2 lz42zst zst2gz zst2xz zst2bz2 zst2lz4
   do
@@ -53,6 +58,11 @@ install_symlinks() {
 }
 # Remove symlinks function.
 remove_symlinks() {
+  if [ ! -z "$GZ2XZ_VENDORED_INSTALLATION" ]; then
+    echo "Error: This command cannot be run as your installation is a" >&2
+    echo "distribution-provided package, and it may break package managers." >&2
+    exit 1
+  fi
   for link in gz2bz2 gz2lz4 gz2zst xz2gz xz2bz2 xz2lz4 xz2zst bz22gz bz22xz \
   bz22lz4 bz22zst lz42gz lz42xz lz42bz2 lz42zst zst2gz zst2xz zst2bz2 zst2lz4
   do
@@ -203,6 +213,8 @@ if [ ! -f "$1" ]; then
   echo "Error: Cannot convert non-existant file ($1)."
   exit 1
 fi
+# Set a working directory.
+wdir="$(mktemp -d)"
 # Run the function depending on invocation
 case "$invocation" in
   gz2xz  ) gz_to_xz   $1 ;;

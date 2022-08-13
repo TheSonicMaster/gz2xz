@@ -1,0 +1,53 @@
+.TH "GZ2XZ" "1" "August 2022" "gz2xz" "User Commands"
+.hy
+.SH NAME
+.PP
+gz2xz - Covert files between different compression algorithms.
+.SH SYNOPSIS
+.PP
+\f[B]gz2xz <file_to_convert>\f[R]
+.SH DESCRIPTION
+.PP
+\f[B]gz2xz\f[R] coverts files between different compression algorithms. Despite it's name, it supports coverting many compressed file types, including the following:
+
+\f[B].gz\f[R]  (gz2xz,  gz2bz2, gz2lz4,  gz2zst ) [Requires installed gzip ]
+
+\f[B].xz\f[R]  (xz2gz,  xz2bz2, xz2lz4,  xz2zst ) [Requires installed xz   ]
+
+\f[B].bz2\f[R] (bz22gz, bz22xz, bz22lz4, bz22zst) [Requires installed bzip2]
+
+\f[B].lz4\f[R] (lz42gz, lz42xz, lz42bz2, lz42zst) [Requires installed lz4  ]
+
+\f[B].zst\f[R] (zst2gz, zst2xz, zst2bz2, zst2lz4) [Requires installed zstd ]
+
+Symlinks are used to define what coversion should take place. For example, if invoked as \f[B]xz2zst\f[R], then it will convert .xz to .zst.
+
+If you are using a distribution-provided package of \f[B]gz2xz\f[R], symlinks should be installed automatically (and you cannot change this as the installation was configured as vendor-locked to avoid package manager conflicts). However, if you manually installed \f[B]gz2xz\f[R] from the source repository, you can pass the option \f[B]--install-symlinks\f[R] or \f[B]--remove-symlinks\f[R] to install or remove the necessary symlinks respectively.
+
+.SH EXIT STATUS
+.PP
+\f[B]gz2xz\f[R] will exit with 0 for success and >0 for failure.
+.SH EXAMPLES
+.TP
+\f[B]gz2xz foo-1.0.tar.gz\f[R]
+Coverts the .gz compressed \f[B]foo-1.0.tar.gz\f[R] file to a .xz compressed file named \f[B]foo-1.0.tar.xz\f[R].
+.TP
+\f[B]xz2zst compressed-doc.txt.xz\f[R]
+Converts the .xz compressed \f[B]compressed-doc.txt.xz\f[R] to a .zst compressed file named \f[B]compressed-doc.txt.zst\f[R].
+.TP
+\f[B]gz2xz --install-symlinks\f[R]
+Installs the necessary symlinks if they aren't already installed (not available on distribution-provided packages to avoid package manager conflicts).
+.TP
+\f[B]gz2xz --remove-symlinks\f[R]
+Removes the necessary symlinks if they are installed (not available on distribution-provided packages to avoid package manager conflicts).
+.SH SEE ALSO
+.TP
+gzip(1), xz(1), bzip2(1), lz4(1), zstd(1)
+.SH BUGS
+.PP
+Report bugs to <https://github.com/TheSonicMaster/gz2xz/issues>.
+.SH COPYRIGHT
+.PP
+Copyright (C) 2021-2022 The Sonic Master.
+
+This is GPL-3.0+ licensed free software. A copy of the license can be obtained from <https://www.gnu.org/licenses/gpl.html>.

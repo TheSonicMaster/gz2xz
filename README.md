@@ -5,9 +5,7 @@ gz2xz is a small tool written in Bash which can convert files between multiple d
 
 Symlinks are used to define what conversion should take place. For example: if invoked as 'xz2zst', then it will convert .xz to .zst.
 
-For convenience, the `--install-symlinks` option will install all possible symlinks for you, so you don't have to do any manual work."
-
-The `--remove-symlinks` option will remove any symlinks that were installed by `--install-symlinks`."
+If you are using a distribution-provided package of gz2xz (see "Distributions" below), symlinks should be installed automatically. However, if you manually installed gz2xz from the source repository, you can pass `--install-symlinks` or `--remove-symlinks` to install or remove the symlinks respectively.
 
 Conversion requires the following software:
 
@@ -21,21 +19,25 @@ Not all of the above programs are required, but conversion with the appropriate 
 # Usage
 Convert a .gz compressed file to .xz (default):
 ```
-gz2xz <file_to_convert>
+gz2xz file-to-convert.gz
 ```
-Install symlinks to support other conversions (Must be run as root if gz2xz is installed in a read-only folder like `/usr/local/bin`):
+Convert a .bz2 compressed file to .lz4 (assuming symlinks are installed):
+```
+bz22lz4 file-to-convert.bz2
+```
+Install symlinks to support other conversions (not available on distribution-provided packages - symlinks should be installed by default):
 ```
 gz2xz --install-symlinks
 ```
-After installing the symlinks, you can convert other file types. For example: To convert a .bz2 to a .lz4:
-```
-bz22lz4 <file_to_convert>
-```
-If you want to remove the installed symlinks:
+Remove installed symlinks (not available on distribution-provided packages):
 ```
 gz2xz --remove-symlinks
 ```
 # Installation
+- [MassOS](https://massos.org): gz2xz is included by default.
+
+If your distribution doesn't have a package available, you can manually install it following the steps beow.
+
 Clone the repository:
 ```
 git clone https://github.com/TheSonicMaster/gz2xz.git
@@ -45,12 +47,18 @@ Install it (must be run as root):
 ```
 make install
 ```
-The default installation path is `/usr/local/bin`. You can customise the path that gz2xz will be installed in by setting INSTALL_DIR. For example:
+The default installation path is `/usr/local/bin`, and the default manual page path is `/usr/local/share/man`. You can customise these by specifying `INSTALL_DIR` and `MAN_DIR` respectively. For example:
 ```
-make INSTALL_DIR=/path/to/my/custom/installation/folder install
+make INSTALL_DIR=/opt/my-package-prefix/bin MAN_DIR=/opt/my-package-prefix/share/man install
 ```
 To uninstall (as root):
 ```
 make uninstall
 ```
-INSTALL_DIR also works with uninstalling.
+`INSTALL_DIR` and `MAN_DIR` also work with uninstalling, however note that symlinks will not be automatically removed.
+# Distributions
+If you are packaging gz2xz for a distribution, you can replace `install` with `install-vendored` to prevent the user from being able to run `--install-symlinks` or `--remove-symlinks`, which could cause package manager conflicts:
+```
+make INSTALL_DIR=${PackagingDir}/usr/bin MAN_DIR=${PackagingDir}/usr/share/man install-vendored
+```
+Symlinks will be installed automatically in this case.
